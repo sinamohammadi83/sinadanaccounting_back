@@ -1,0 +1,9 @@
+{
+    "Admin": true,
+    "Product": true,
+    "Users": true,
+    "SiteSettings": true,
+    "BuyAndSell": true,
+    "Category": true,
+    "Migrate": true
+}
