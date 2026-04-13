@@ -3,6 +3,7 @@
 use App\Http\Controllers\Branch\FactorController;
 use App\Http\Controllers\Branch\PersonController;
 use App\Http\Controllers\Branch\ProductController;
+use App\Http\Controllers\Branch\ProfileController;
 use App\Http\Controllers\Branch\RoleController;
 use App\Http\Controllers\CityProvinceController;
 use App\Http\Controllers\LoginController;
@@ -44,4 +45,5 @@ Route::prefix('/branch')->middleware(['auth:sanctum'])->group(function (){
     Route::get("/categories",[ProductController::class,'getCategories']);
     Route::get("/provinces",[CityProvinceController::class,"index"]);
     Route::get("/province/{province}",[CityProvinceController::class,"find_cities"]);
+    Route::get('/profile',[ProfileController::class,'show']);
 });
