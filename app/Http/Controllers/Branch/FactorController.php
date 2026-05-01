@@ -61,7 +61,7 @@ class FactorController extends Controller
 
         foreach ($products as $product){
             $productModel = Product::query()->where('id',$product['product_id'])->firstOrFail();
-            if($type){
+            if($type === 1){
                 $productModel->update([
                     'count' =>  $product['count'] + $productModel->count
                 ]);
