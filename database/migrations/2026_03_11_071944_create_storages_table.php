@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('storages', function (Blueprint $table) {
             $table->id();
             $table->foreignId("branch_id")->comment("شعبه")->constrained();
+            $table->string('code')->unique()->comment("کد");
             $table->string("name",50)->comment("نام");
             $table->string("address",255)->comment("آدرس");
             $table->timestamps();

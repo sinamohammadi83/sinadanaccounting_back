@@ -35,23 +35,19 @@ class AdminSeeder extends Seeder
 
         User::query()->create([
             "user_id" => $admin->id,
-            "role_id" => $branchRole->id,
+            "role_id" => $adminRole->id,
             "model" => "App\Http\Models\Admin",
             "username" => "admin",
             "password" => hash("sha256","12345678")
         ]);
 
-        $branch = Branch::query()->create([
-            "name" => "شعبه شیراز",
-            "code" => "44225",
-            "count_staff" => 5,
-            "address" => "خیابان گاز"
-        ]);
+
 
         Storage::query()->create([
-            "branch_id" => $branch->id,
+            "branch_id" => 1,
             "name" => "انبار اصلی",
-            "address" => "شعبه"
+            "address" => "شعبه",
+            'code' => random_int(1111,9999)
         ]);
 
         $staff = Staff::query()->create([
@@ -64,12 +60,12 @@ class AdminSeeder extends Seeder
             "role" => "مدیر اجرایی",
             "father_name" => "شهریار",
             "address" => "شیراز",
-            "branch_id" => $branch->id
+            "branch_id" => 1
         ]);
 
         User::query()->create([
             "user_id" => $staff->id,
-            "role_id" => $adminRole->id,
+            "role_id" => $branchRole->id,
             "model" => "App\Http\Models\Staff",
             "username" => "staff",
             "password" => hash("sha256","12345678")

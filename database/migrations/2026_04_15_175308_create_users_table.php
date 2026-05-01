@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('user_id');
             $table->foreignId('role_id')->constrained();
             $table->string("model",30)->default("App\Http\Models\Staff");
-            $table->string("username",20)->comment("نام کاربری");
+            $table->string("username",20)->unique()->comment("نام کاربری");
             $table->string("password",100)->comment("رمز عبور");
             $table->timestamps();
         });

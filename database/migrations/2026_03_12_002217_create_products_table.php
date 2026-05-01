@@ -22,6 +22,8 @@ return new class extends Migration
             $table->string("pic",255);
             $table->integer("count");
             $table->timestamps();
+
+            $table->unique(['storage_id','name']);
         });
     }
 

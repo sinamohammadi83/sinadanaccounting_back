@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId("staff_id")->comment("کارمند")->constrained();
             $table->foreignId("category_id")->comment("دسته بندی")->constrained();
             $table->foreignId("person_id")->comment("شخص")->constrained();
-            $table->string("title",50)->comment("عنوان");
+            $table->string("title",50)->unique()->comment("عنوان");
             $table->date("date")->comment("تاریخ");
             $table->date("due_date")->comment("تاریخ سررسید");
             $table->unsignedBigInteger("paid_price")->comment("هزینه پرداخت شده");

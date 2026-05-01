@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Branch;
 use App\Models\Permission;
 use App\Models\Role;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -31,17 +32,17 @@ class PermissionsSeeder extends Seeder
             ],
             [
                 "title" => "مشاهده انبار",
-                "permission" => "read-storage"
+                "permission" => "read-product"
             ],
             [
                 "title" => "ایجاد انبار",
-                "permission" => "create-storage"
+                "permission" => "create-product"
             ],[
                 "title" => "ویرایش انبار",
-                "permission" => "edit-storage"
+                "permission" => "edit-product"
             ],[
                 "title" => "حذف انبار",
-                "permission" => "delete-storage"
+                "permission" => "delete-product"
             ],
             [
                 "title" => "مشاهده فاکتور",
@@ -179,16 +180,24 @@ class PermissionsSeeder extends Seeder
             ],
         ]);
 
-        $branchRole = Role::query()->create([
-            "title" => "مدیر شعبه 1"
+        $branch = Branch::query()->create([
+            "name" => "شعبه شیراز",
+            "code" => "44225",
+            "count_staff" => 5,
+            "address" => "خیابان گاز"
         ]);
 
-        $branchRole->permission()->attach(Permission::query()->where("permission", "not like","%-admin")->get());
+        $branchRole = Role::query()->create([
+            "title" => "مدیر شعبه 1",
+            'branch_id' => 1
+        ]);
+
+        $branchRole->permissions()->attach(Permission::query()->where("permission", "not like","%-admin")->get());
 
         $adminRole = Role::query()->create([
             "title" => "مدیر کل"
         ]);
 
-        $adminRole->permission()->attach(Permission::query()->where("permission", "like","%-admin")->get());
+        $adminRole->permissions()->attach(Permission::query()->where("permission", "like","%-admin")->get());
     }
 }

@@ -20,14 +20,24 @@ class LoginController extends Controller
 
         $user->tokens()->delete();
 
+
         if($user->model == "App\Http\Models\Admin"){
             return response()->json([
                 'token' => $user->createToken("user")->plainTextToken . str(uuid_create())->substr(0,3),
             ])->setStatusCode(200);
         }
 
+        $token = $user->createToken("user")->plainTextToken;
+
+        $permissions = $user->getPermissions();
+
+
+        $user->tokens()->latest()->first()->update([
+            'abilities' => $permissions
+        ]);
+
         return response()->json([
-            'token' => $user->createToken("user")->plainTextToken,
+            'token' => $token
         ])->setStatusCode(200);
     }
 

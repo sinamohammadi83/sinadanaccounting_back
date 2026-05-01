@@ -14,4 +14,11 @@ class ProfileController extends Controller
             'user' => new ProfileResource(auth()->user())
         ])->setStatusCode(200);
     }
+
+    public function getPermissions()
+    {
+        return response()->json([
+            'permissions' => auth()->user()->role->permissions
+        ])->setStatusCode(200);
+    }
 }

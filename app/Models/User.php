@@ -20,4 +20,14 @@ class User extends Model
     {
         return $this->belongsTo(Role::class);
     }
+
+    public function getPermissions()
+    {
+        return $this->role->permissions->pluck('permission');
+    }
+
+    public function hasPermission($permission)
+    {
+        return $this->tokenCan($permission);
+    }
 }

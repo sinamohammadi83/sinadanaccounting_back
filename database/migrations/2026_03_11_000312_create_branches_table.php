@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('branches', function (Blueprint $table) {
             $table->id();
-            $table->string("name",30)->comment("نام");
+            $table->string("name",30)->unique()->comment("نام");
             $table->string("code",8)->comment("کد شعبه");
             $table->integer("count_staff")->comment("تعداد کارکنان");
             $table->string("address",255)->comment("آدرس");

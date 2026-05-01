@@ -15,9 +15,9 @@ return new class extends Migration
             $table->id();
             $table->string("name",15)->comment("نام");
             $table->string("family",15)->comment("نام خانوادگی");
-            $table->string("mobile",11)->comment("موبایل");
+            $table->string("mobile",11)->unique()->comment("موبایل");
             $table->string("admin_code",10)->comment("کد مدیریت");
-            $table->string("national_code",11)->comment("کد ملی");
+            $table->string("national_code",11)->unique()->comment("کد ملی");
             $table->string("education",15)->comment("تحصیلات");
             $table->string("role",15)->comment("سمت");
             $table->string("father_name",15)->comment("نام پدر");

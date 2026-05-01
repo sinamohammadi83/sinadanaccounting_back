@@ -14,6 +14,8 @@ class PersonController extends Controller
      */
     public function index()
     {
+        $this->authorize('read-person');
+
         return response()->json([
             'persons' => auth()->user()->staff->branch->persons
         ])->setStatusCode(200);
@@ -32,6 +34,8 @@ class PersonController extends Controller
      */
     public function store(PersonRequest $request)
     {
+        $this->authorize('create-person');
+
         $request["branch_id"] = auth()->user()->staff->branch_id;
 
         Person::query()->create($request->toArray());
@@ -46,6 +50,8 @@ class PersonController extends Controller
      */
     public function show(Person $person)
     {
+        $this->authorize('read-person');
+
         return response()->json([
             'person' => $person
         ],200);
@@ -64,6 +70,7 @@ class PersonController extends Controller
      */
     public function update(PersonRequest $request,Person $person)
     {
+        $this->authorize('edit-person');
 
         $person->update($request->toArray());
 
@@ -77,6 +84,8 @@ class PersonController extends Controller
      */
     public function destroy(Person $person)
     {
+        $this->authorize('delete-person');
+
         $person->delete();
 
         return response()->json([

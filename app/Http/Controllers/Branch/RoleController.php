@@ -16,6 +16,8 @@ class RoleController extends Controller
      */
     public function index()
     {
+        $this->authorize('read-role');
+
         return response()->json([
             'roles' => RoleResource::collection(Role::query()->where('branch_id',auth()->user()->staff->branch_id)->get())
         ])->setStatusCode(200);
@@ -34,6 +36,8 @@ class RoleController extends Controller
      */
     public function store(CreateRoleRequest $request)
     {
+        $this->authorize('create-role');
+
         $role = Role::query()->create([
             'title' => $request->get('title'),
             'branch_id' => auth()->user()->staff->branch_id
@@ -51,6 +55,8 @@ class RoleController extends Controller
      */
     public function show(Role $role)
     {
+        $this->authorize('read-role');
+
         return response()->json([
             'role' => new RoleResource($role)
         ])->setStatusCode(200);
@@ -69,6 +75,8 @@ class RoleController extends Controller
      */
     public function update(CreateRoleRequest $request, Role $role)
     {
+        $this->authorize('edit-role');
+
         $role->update([
             'title' => $request->get('title')
         ]);
@@ -85,6 +93,8 @@ class RoleController extends Controller
      */
     public function destroy(Role $role)
     {
+        $this->authorize('delete-role');
+
         $role->permissions()->detach();
 
         $role->delete();

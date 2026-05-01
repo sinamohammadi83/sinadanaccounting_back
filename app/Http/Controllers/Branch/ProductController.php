@@ -18,6 +18,8 @@ class ProductController extends Controller
      */
     public function index()
     {
+        $this->authorize('read-product');
+
         $storage_ids = auth()->user()->staff->branch->storages->pluck('id');
         return response()->json([
             'products' => ProductResource::collection(Product::query()->whereIn("storage_id",$storage_ids)->get())
@@ -37,6 +39,8 @@ class ProductController extends Controller
      */
     public function store(CreateProductRequest $request)
     {
+        $this->authorize('create-product');
+
         $pic_address = $request
             ->file("pic")
             ->store("images/product"
@@ -72,6 +76,8 @@ class ProductController extends Controller
      */
     public function show(Product $product)
     {
+        $this->authorize('read-product');
+
         return response()->json([
             'product' => new ProductResource($product)
         ])->setStatusCode(200);
@@ -90,6 +96,8 @@ class ProductController extends Controller
      */
     public function update(UpdateProductRequest $request, Product $product)
     {
+        $this->authorize('edit-product');
+
         if($request->hasFile("pic")){
             $pic = $request->get('pic');
         }else{
@@ -117,6 +125,8 @@ class ProductController extends Controller
      */
     public function destroy(Product $product)
     {
+        $this->authorize('delete-product');
+
         $product->delete();
 
         return response()->json([

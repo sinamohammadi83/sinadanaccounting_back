@@ -46,4 +46,5 @@ Route::prefix('/branch')->middleware(['auth:sanctum'])->group(function (){
     Route::get("/provinces",[CityProvinceController::class,"index"]);
     Route::get("/province/{province}",[CityProvinceController::class,"find_cities"]);
     Route::get('/profile',[ProfileController::class,'show']);
+    Route::get('/get-permissions',[ProfileController::class,'getPermissions']);
 });

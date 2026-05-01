@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string("first_name",15)->comment("نام");
             $table->string("last_name",15)->comment("نام خانوادگی");
             $table->string("community",100)->nullable()->comment("شرکت");
-            $table->string("mobile",11)->comment("موبایل");
+            $table->string("mobile",11)->unique()->comment("موبایل");
             $table->string("tel",11)->nullable()->comment("تلفن");
             $table->string("postal_code",10)->comment("کد پستی");
             $table->string("email",30)->nullable()->comment("ایمیل");

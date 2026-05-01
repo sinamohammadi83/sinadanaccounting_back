@@ -18,6 +18,8 @@ class FactorController extends Controller
      */
     public function index()
     {
+        $this->authorize('read-factor');
+
         return response()->json([
             'factors' => FactorResource::collection(Factor::all())
         ])->setStatusCode(200);
@@ -36,6 +38,8 @@ class FactorController extends Controller
      */
     public function store(CreateFactorRequest $request)
     {
+        $this->authorize('create-factor');
+
         $type = $request->get('type');
 
         $factor = Factor::query()->create([
@@ -102,6 +106,8 @@ class FactorController extends Controller
      */
     public function show(Factor $factor)
     {
+        $this->authorize('read-factor');
+
         return response()->json([
             'factor' => new FactorResource($factor)
         ])->setStatusCode(200);
@@ -120,6 +126,8 @@ class FactorController extends Controller
      */
     public function update(UpdateFactorRequest $request, Factor $factor)
     {
+        $this->authorize('edit-factor');
+
         $type = (int) $request->get('type');
 
         $factor->update([
@@ -187,6 +195,8 @@ class FactorController extends Controller
      */
     public function destroy(Factor $factor)
     {
+        $this->authorize('delete-factor');
+
         $factor->factorProduct()->detach();
 
         $factor->delete();
