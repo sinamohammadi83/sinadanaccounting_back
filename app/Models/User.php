@@ -11,6 +11,8 @@ class User extends Model
 {
     use HasFactory,HasApiTokens;
 
+    protected $guarded = [];
+
     public function staff():BelongsTo
     {
         return $this->belongsTo(Staff::class,"user_id");

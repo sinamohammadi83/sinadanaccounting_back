@@ -1,10 +1,12 @@
 <?php
 
 use App\Http\Controllers\Branch\FactorController;
+use App\Http\Controllers\Branch\LedgerController;
 use App\Http\Controllers\Branch\PersonController;
 use App\Http\Controllers\Branch\ProductController;
 use App\Http\Controllers\Branch\ProfileController;
 use App\Http\Controllers\Branch\RoleController;
+use App\Http\Controllers\Branch\StaffController;
 use App\Http\Controllers\CityProvinceController;
 use App\Http\Controllers\LoginController;
 use Illuminate\Http\Request;
@@ -25,9 +27,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::get("/test",function (){
-    return strlen("ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f");
-});
+//Route::get("/test",function (){
+//    return \Illuminate\Support\Facades\Hash::make(12345678);
+//});
 
 Route::post('/login',[LoginController::class,'store']);
 Route::delete('/logout',[LoginController::class,'destroy'])->middleware("auth:sanctum");
@@ -40,6 +42,8 @@ Route::prefix('/branch')->middleware(['auth:sanctum'])->group(function (){
     Route::resource("products", ProductController::class);
     Route::resource('factors',FactorController::class);
     Route::resource('roles',RoleController::class);
+    Route::resource('ledgers',LedgerController::class);
+    Route::resource('staffs',StaffController::class);
     Route::get('/permissions',[RoleController::class,'get_permissions']);
     Route::get("/storages",[ProductController::class,'getStorages']);
     Route::get("/categories",[ProductController::class,'getCategories']);

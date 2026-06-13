@@ -7,6 +7,7 @@ use App\Http\Requests\Branch\CreateFactorRequest;
 use App\Http\Requests\Branch\UpdateFactorRequest;
 use App\Http\Resources\Branch\FactorResource;
 use App\Models\Factor;
+use App\Models\Ledger;
 use App\Models\Product;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
@@ -41,6 +42,7 @@ class FactorController extends Controller
         $this->authorize('create-factor');
 
         $type = $request->get('type');
+        $paid_price = $request->get('paid_price');
 
         $factor = Factor::query()->create([
             'branch_id' => auth()->user()->staff->branch_id,
@@ -65,6 +67,7 @@ class FactorController extends Controller
                 $productModel->update([
                     'count' =>  $product['count'] + $productModel->count
                 ]);
+
             }else{
                 $productModel->update([
                     'count' =>  $productModel->count - $product['count']
@@ -94,6 +97,13 @@ class FactorController extends Controller
             $factor->factorProduct()->attach($product['product_id'],$productData);
 
         }
+
+        if ($paid_price > 0)
+            Ledger::query()->create([
+                'type' => $type,
+                'amount' => $paid_price,
+                'description' => $type == 1 ? "جهت فاکتور خرید - $factor->title" : "جهت فاکتور فروش - $factor->title"
+            ]);
 
         return response()->json([
             'msg' => 'فاکتور با موفقیت افزوده شد'
@@ -129,6 +139,8 @@ class FactorController extends Controller
         $this->authorize('edit-factor');
 
         $type = (int) $request->get('type');
+        $paid_price = $request->get('paid_price');
+        $last_paid_price = $factor->paid_price;
 
         $factor->update([
             'branch_id' => auth()->user()->staff->branch_id,
@@ -179,6 +191,13 @@ class FactorController extends Controller
                 'total_price' => $total_price_product,
             ];
         }
+
+        if ($paid_price > 0 && $paid_price !== $last_paid_price)
+            Ledger::query()->create([
+                'type' => $type,
+                'amount' => $paid_price - $last_paid_price,
+                'description' => $type == 1 ? "جهت فاکتور خرید - $factor->title" : "جهت فاکتور فروش - $factor->title"
+            ]);
 
         $factor->update([
             'total_price' => $total_price_factor

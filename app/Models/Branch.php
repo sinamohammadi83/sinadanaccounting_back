@@ -25,4 +25,9 @@ class Branch extends Model
     {
         return $this->hasMany(Factor::class);
     }
+
+    public function staffs()
+    {
+        return $this->hasMany(Staff::class);
+    }
 }

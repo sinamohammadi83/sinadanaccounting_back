@@ -6,6 +6,7 @@ use App\Http\Requests\LoginRequest;
 use App\Models\Staff;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class LoginController extends Controller
 {
@@ -13,10 +14,15 @@ class LoginController extends Controller
 
     public function store(LoginRequest $request)
     {
+
         $user = User::query()
             ->where("username",$request->get("username"))
-            ->where("password",hash("sha256",$request->get("password")))
             ->firstOrFail();
+
+        if(!Hash::check($request->get('password'),$user->password))
+        {
+            abort(404,'No query results for model [App\\Models\\User].');
+        }
 
         $user->tokens()->delete();
 

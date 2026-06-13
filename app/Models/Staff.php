@@ -10,8 +10,15 @@ class Staff extends Model
 {
     use HasFactory;
 
+    protected $guarded = [];
+
     public function Branch():BelongsTo
     {
         return $this->belongsTo(Branch::class);
+    }
+
+    public function user()
+    {
+        return $this->hasOne(User::class,'user_id');
     }
 }
