@@ -10,6 +10,7 @@ use App\Models\Storage;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class AdminSeeder extends Seeder
 {
@@ -68,7 +69,7 @@ class AdminSeeder extends Seeder
             "role_id" => $branchRole->id,
             "model" => "App\Http\Models\Staff",
             "username" => "staff",
-            "password" => hash("sha256","12345678")
+            "password" => Hash::make(12345678)
         ]);
     }
 }
