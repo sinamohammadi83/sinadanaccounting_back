@@ -13,7 +13,9 @@ class AccountController extends Controller
      */
     public function index()
     {
-        //
+        return response()->json([
+            'accounts' => auth()->user()->staff->branch->accounts
+        ])->setStatusCode(200);
     }
 
     /**
@@ -30,10 +32,15 @@ class AccountController extends Controller
     public function store(Request $request)
     {
         Account::query()->create([
-            "name"=> $request->get('name'),
-            "code"=> random_int(1111,9999),
-            "type"=> $request->get('type'),
+            'branch_id' => auth()->user()->staff->branch_id,
+            "name" => $request->get('name'),
+            "code" => random_int(1111,9999),
+            "type" => $request->get('type'),
         ]);
+
+        return response()->json([
+            'msg' => 'حساب با موفیت اضاف شد'
+        ])->setStatusCode(200);
     }
 
     /**
@@ -41,7 +48,9 @@ class AccountController extends Controller
      */
     public function show(Account $account)
     {
-        //
+        return response()->json([
+            'account' => $account
+        ])->setStatusCode(200);
     }
 
     /**
@@ -57,7 +66,15 @@ class AccountController extends Controller
      */
     public function update(Request $request, Account $account)
     {
-        //
+        $account->update([
+            'branch_id' => auth()->user()->staff->branch_id,
+            "name" => $request->get('name'),
+            "type" => $request->get('type'),
+        ]);
+
+        return response()->json([
+            'msg' => 'حساب با موفیت ویرایش شد'
+        ])->setStatusCode(200);
     }
 
     /**
@@ -65,6 +82,10 @@ class AccountController extends Controller
      */
     public function destroy(Account $account)
     {
-        //
+        $account->delete();
+
+        return response()->json([
+            'msg' => 'حساب با موفیت حذف شد'
+        ])->setStatusCode(200);
     }
 }

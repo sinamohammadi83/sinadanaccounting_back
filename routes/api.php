@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Branch\AccountController;
 use App\Http\Controllers\Branch\FactorController;
 use App\Http\Controllers\Branch\LedgerController;
 use App\Http\Controllers\Branch\PersonController;
@@ -44,6 +45,7 @@ Route::prefix('/branch')->middleware(['auth:sanctum'])->group(function (){
     Route::resource('roles',RoleController::class);
     Route::resource('ledgers',LedgerController::class);
     Route::resource('staffs',StaffController::class);
+    Route::resource('accounts',AccountController::class);
     Route::get('/permissions',[RoleController::class,'get_permissions']);
     Route::get("/storages",[ProductController::class,'getStorages']);
     Route::get("/categories",[ProductController::class,'getCategories']);
@@ -52,4 +54,5 @@ Route::prefix('/branch')->middleware(['auth:sanctum'])->group(function (){
     Route::get('/profile',[ProfileController::class,'show']);
     Route::get('/get-permissions',[ProfileController::class,'getPermissions']);
     Route::get('/reports',[\App\Http\Controllers\Branch\ReportController::class,'index']);
+
 });
