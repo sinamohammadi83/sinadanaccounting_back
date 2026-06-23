@@ -20,9 +20,8 @@ class ProductController extends Controller
     {
         $this->authorize('read-product');
 
-        $storage_ids = auth()->user()->staff->branch->storages->pluck('id');
         return response()->json([
-            'products' => ProductResource::collection(Product::query()->whereIn("storage_id",$storage_ids)->get())
+            'products' => auth()->user()->staff->branch->products
         ])->setStatusCode(200);
     }
 
@@ -41,22 +40,13 @@ class ProductController extends Controller
     {
         $this->authorize('create-product');
 
-        $pic_address = $request
-            ->file("pic")
-            ->store("images/product"
-//                $request
-//                    ->file("pic")
-//                    ->getFilename()
-            );
-
         $product = Product::query()->create([
-            'storage_id' => $request->get("storage_id"),
+            'branch_id' => auth()->user()->staff->branch_id,
             'staff_id' => auth()->user()->staff->id,
             'category_id' => $request->get('category_id'),
             'name' => $request->get('name'),
             'sell_price' => $request->get('sell_price'),
             'buy_price' => $request->get('buy_price'),
-            'pic' => $pic_address,
             'count' => $request->get('count'),
         ]);
 

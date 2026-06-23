@@ -13,9 +13,8 @@ class Product extends Model
         "name",
         "buy_price",
         "sell_price",
-        "pic",
         "count",
-        "storage_id",
+        "branch_id",
         "category_id",
         "staff_id"
     ];

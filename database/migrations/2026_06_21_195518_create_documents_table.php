@@ -12,14 +12,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('documents', function (Blueprint $table) {
-            $table->id();
+            $table->id()->startingValue(100000);
+            $table->date('date');
             $table->foreignId('branch_id')->constrained();
             $table->foreignId('staff_id')->constrained();
-            $table->foreignId('account_id')->comment('حساب')->constrained();
+            $table->foreignId('accept_staff_id')->constrained('staff');
+            $table->foreignId('factor_id')->comment('فاکتور')->constrained();
             $table->string('description',255);
             $table->tinyInteger('type');
-            $table->unsignedBigInteger('debtor');
-            $table->unsignedBigInteger('creditor');
+            $table->string('status',1);
             $table->timestamps();
         });
     }

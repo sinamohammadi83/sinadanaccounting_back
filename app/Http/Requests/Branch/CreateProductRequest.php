@@ -22,12 +22,10 @@ class CreateProductRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'storage_id' => ['required','exists:storages,id'],
             'category_id' => ['required','exists:categories,id'],
             'name' => ['required','min:3','max:255'],
             'buy_price' => ['required','integer','min:1000','max:1000000000'],
             'sell_price' => ['required','integer','min:1000','max:1000000000'],
-            'pic' => ['required','mimes:png,jpg,webp','max:2048'],
             'count' => ['required','integer','min:1','max:2000'],
         ];
     }

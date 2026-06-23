@@ -11,14 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('accounts', function (Blueprint $table) {
+        Schema::create('document_rows', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('branch_id')->constrained();
+            $table->foreignId('account_id')->constrained();
+            $table->string('account_name');
+            $table->text('description');
+            $table->string('detailed_code',4);
             $table->unsignedBigInteger('debtor');
             $table->unsignedBigInteger('creditor');
-            $table->string('name');
-            $table->string('code');
-            $table->string('type');
+            $table->date('due_date');
             $table->timestamps();
         });
     }
@@ -28,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('accounts');
+        Schema::dropIfExists('document_rows');
     }
 };
