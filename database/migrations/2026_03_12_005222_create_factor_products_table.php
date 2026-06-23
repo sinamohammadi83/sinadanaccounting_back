@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId("factor_id")->comment("فاکتور")->constrained();
             $table->foreignId("product_id")->comment("کالا")->constrained();
+            $table->foreignId('storage_id')->comment('انبار')->constrained();
             $table->string("description",255)->nullable()->comment("توضیحات");
             $table->string("unit",10)->comment("واحد");
             $table->integer("count")->comment("تعداد");
