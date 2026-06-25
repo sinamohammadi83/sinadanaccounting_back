@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Product extends Model
 {
     use HasFactory;
+
+
     protected $fillable = [
         "name",
         "buy_price",
@@ -16,7 +18,8 @@ class Product extends Model
         "count",
         "branch_id",
         "category_id",
-        "staff_id"
+        "staff_id",
+        'product_code'
     ];
 
     public function category():BelongsTo

@@ -21,6 +21,11 @@ class Branch extends Model
         return $this->hasMany(Product::class);
     }
 
+    public function storages():hasMany
+    {
+        return $this->hasMany(Storage::class);
+    }
+
     public function factors():HasMany
     {
         return $this->hasMany(Factor::class);

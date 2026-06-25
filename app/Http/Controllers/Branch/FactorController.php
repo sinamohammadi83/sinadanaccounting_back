@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Branch\CreateFactorRequest;
 use App\Http\Requests\Branch\UpdateFactorRequest;
 use App\Http\Resources\Branch\FactorResource;
+use App\Models\Account;
+use App\Models\document;
+use App\Models\documentRows;
 use App\Models\Factor;
 use App\Models\Ledger;
 use App\Models\Product;
@@ -61,6 +64,21 @@ class FactorController extends Controller
 
         $total_price_factor = 0;
 
+        $document = document::query()->create([
+            'date' => $request->get('date'),
+            'branch_id' => auth()->user()->staff->branch_id,
+            'staff_id' => auth()->user()->staff->id,
+            'factor_id' => $factor->id,
+            'description' => 'سند خودکار',
+            'type' => $request->get('type'),
+            'status' => $request->get('type'),
+
+        ]);
+
+        $creditor_account = Account::query()
+            ->where('type','creditor')
+            ->first();
+
         foreach ($products as $product){
             $productModel = Product::query()->where('id',$product['product_id'])->firstOrFail();
             if($type === 1){
@@ -79,14 +97,13 @@ class FactorController extends Controller
             $total_price_factor += $total_price_product;
 
             $productData = [
-                'description' => $product['description'],
                 'unit' => $product['unit'],
                 'count' => $product['count'],
                 'unit_price' => $product['unit_price'],
                 'discount' => $product['discount'],
                 'tax' => $product['tax'],
                 'total_price' => $total_price_product,
-
+                'storage_id' => $product['storage_id']
             ];
 
 
@@ -96,14 +113,34 @@ class FactorController extends Controller
 
             $factor->factorProduct()->attach($product['product_id'],$productData);
 
+            documentRows::query()->create([
+                'document_id' => $document->id,
+                'account_name' => $creditor_account->name,
+                'description' => $productModel->name,
+                'detailed_code' => random_int(1111,4444),
+                'debtor' => 0,
+                'creditor' => $total_price_product,
+                'due_date' => $request->get('due_date')
+            ]);
         }
 
-        if ($paid_price > 0)
-            Ledger::query()->create([
-                'type' => $type,
-                'amount' => $paid_price,
-                'description' => $type == 1 ? "جهت فاکتور خرید - $factor->title" : "جهت فاکتور فروش - $factor->title"
-            ]);
+        $debtor_account = Account::query()
+            ->where('type','debtor')
+            ->first();
+
+        documentRows::query()->create([
+            'account_id' => $debtor_account->id,
+            'document_id' => $document->id,
+            'account_name' => $debtor_account->name,
+            'description' => $productModel->name,
+            'detailed_code' => random_int(1111,4444),
+            'debtor' => $factor->total_price,
+            'creditor' => 0,
+            'due_date' => $request->get('due_date')
+        ]);
+
+
+
 
         return response()->json([
             'msg' => 'فاکتور با موفقیت افزوده شد'
@@ -222,6 +259,13 @@ class FactorController extends Controller
 
         return response()->json([
             'msg' => 'فاکتور با موفقیت حذف شد'
+        ])->setStatusCode(200);
+    }
+
+    public function getStorages()
+    {
+        return response()->json([
+            'storages' => auth()->user()->staff->branch->storages
         ])->setStatusCode(200);
     }
 }

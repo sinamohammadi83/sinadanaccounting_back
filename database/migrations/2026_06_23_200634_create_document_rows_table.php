@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('document_rows', function (Blueprint $table) {
             $table->id();
             $table->foreignId('account_id')->constrained();
+            $table->foreignId('document_id')->constrained();
             $table->string('account_name');
             $table->text('description');
             $table->string('detailed_code',4);

@@ -16,7 +16,7 @@ return new class extends Migration
             $table->date('date');
             $table->foreignId('branch_id')->constrained();
             $table->foreignId('staff_id')->constrained();
-            $table->foreignId('accept_staff_id')->constrained('staff');
+            $table->foreignId('accept_staff_id')->nullable()->constrained('staff');
             $table->foreignId('factor_id')->comment('فاکتور')->constrained();
             $table->string('description',255);
             $table->tinyInteger('type');

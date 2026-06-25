@@ -22,7 +22,7 @@ class ProductResource extends JsonResource
             "pic" => env("BASE_URL_PIC") ."storage/". $this->pic,
             "count" => $this->count,
             "category" => $this->category,
-            "storage" => $this->storage,
+            "product_code" => $this->product_code,
         ];
     }
 }

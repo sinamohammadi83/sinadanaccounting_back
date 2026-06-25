@@ -48,6 +48,7 @@ class ProductController extends Controller
             'sell_price' => $request->get('sell_price'),
             'buy_price' => $request->get('buy_price'),
             'count' => $request->get('count'),
+            'product_code' => $request->get('product_code'),
         ]);
 
         if($product){
@@ -121,13 +122,6 @@ class ProductController extends Controller
 
         return response()->json([
             'msg' => 'کالا با موفقیت حذف شد'
-        ])->setStatusCode(200);
-    }
-
-    public function getStorages()
-    {
-        return response()->json([
-            'storages' => auth()->user()->staff->branch->storages
         ])->setStatusCode(200);
     }
 

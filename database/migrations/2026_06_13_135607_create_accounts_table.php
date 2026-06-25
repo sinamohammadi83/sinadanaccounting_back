@@ -14,8 +14,7 @@ return new class extends Migration
         Schema::create('accounts', function (Blueprint $table) {
             $table->id();
             $table->foreignId('branch_id')->constrained();
-            $table->unsignedBigInteger('debtor');
-            $table->unsignedBigInteger('creditor');
+            $table->foreignId('person_id')->constrained();
             $table->string('name');
             $table->string('code');
             $table->string('type');

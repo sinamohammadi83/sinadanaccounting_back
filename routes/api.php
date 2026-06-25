@@ -47,7 +47,7 @@ Route::prefix('/branch')->middleware(['auth:sanctum'])->group(function (){
     Route::resource('staffs',StaffController::class);
     Route::resource('accounts',AccountController::class);
     Route::get('/permissions',[RoleController::class,'get_permissions']);
-    Route::get("/storages",[ProductController::class,'getStorages']);
+    Route::get("/storages",[FactorController::class,'getStorages']);
     Route::get("/categories",[ProductController::class,'getCategories']);
     Route::get("/provinces",[CityProvinceController::class,"index"]);
     Route::get("/province/{province}",[CityProvinceController::class,"find_cities"]);
