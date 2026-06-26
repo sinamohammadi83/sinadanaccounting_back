@@ -54,5 +54,5 @@ Route::prefix('/branch')->middleware(['auth:sanctum'])->group(function (){
     Route::get('/profile',[ProfileController::class,'show']);
     Route::get('/get-permissions',[ProfileController::class,'getPermissions']);
     Route::get('/reports',[\App\Http\Controllers\Branch\ReportController::class,'index']);
-
+    Route::get('/individual-account-activity/{person}',[\App\Http\Controllers\Branch\IndividualAccountActivityController::class,'show']);
 });

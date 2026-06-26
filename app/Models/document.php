@@ -10,4 +10,9 @@ class document extends Model
     use HasFactory;
 
     protected $guarded = [];
+
+    public function documentRows()
+    {
+        return $this->hasMany(documentRows::class);
+    }
 }

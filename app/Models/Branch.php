@@ -40,4 +40,9 @@ class Branch extends Model
     {
         return $this->hasMany(Account::class);
     }
+
+    public function documents()
+    {
+        return $this->hasMany(document::class);
+    }
 }

@@ -10,4 +10,9 @@ class Person extends Model
     use HasFactory;
 
     protected $guarded = [];
+
+    public function factors()
+    {
+        return $this->hasMany(Factor::class);
+    }
 }

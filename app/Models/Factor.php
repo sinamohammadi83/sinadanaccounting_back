@@ -33,4 +33,9 @@ class Factor extends Model
     {
         return $this->belongsTo(Category::class);
     }
+
+    public function document()
+    {
+        return $this->hasMany(document::class);
+    }
 }
