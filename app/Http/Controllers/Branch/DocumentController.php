@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Branch;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Branch\NewDocumentRequest;
+use App\Http\Resources\Branch\DocumentResource;
 use App\Models\document;
 use App\Models\documentRows;
 use Illuminate\Http\Request;
@@ -16,7 +17,7 @@ class DocumentController extends Controller
     public function index()
     {
         return response()->json([
-            'documents' => auth()->user()->staff->branch->documents
+            'documents' => DocumentResource::collection(auth()->user()->staff->branch->documents)
         ])->setStatusCode(200);
     }
 
