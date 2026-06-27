@@ -69,7 +69,7 @@ class FactorController extends Controller
             'branch_id' => auth()->user()->staff->branch_id,
             'staff_id' => auth()->user()->staff->id,
             'factor_id' => $factor->id,
-            'description' => 'سند خودکار',
+            'title' => 'سند خودکار',
             'type' => $request->get('type'),
             'status' => $request->get('type'),
 
@@ -219,7 +219,7 @@ class FactorController extends Controller
             $total_price_factor += $total_price_product;
 
             $syncData[$product['product_id']] = [
-                'description' => $product['description'],
+                'title' => $product['title'],
                 'unit' => $product['unit'],
                 'count' => $product['count'],
                 'unit_price' => $product['unit_price'],
