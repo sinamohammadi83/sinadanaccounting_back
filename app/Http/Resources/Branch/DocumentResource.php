@@ -22,7 +22,8 @@ class DocumentResource extends JsonResource
             'type' => $this->type,
             'status' => $this->status,
             'date' => $this->date,
-            'due_date' => $this->due_date
+            'due_date' => $this->due_date,
+            'document_rows' => DocumentRowsResource::collection($this->documentRows)
         ];
     }
 }

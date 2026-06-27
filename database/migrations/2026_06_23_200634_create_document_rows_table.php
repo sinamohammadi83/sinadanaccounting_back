@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('account_id')->constrained();
             $table->foreignId('document_id')->constrained();
             $table->string('account_name');
+            $table->string('account_code',4);
             $table->text('description');
             $table->string('detailed_code',4);
             $table->unsignedBigInteger('debtor');

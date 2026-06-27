@@ -50,7 +50,8 @@ class DocumentController extends Controller
             documentRows::query()->create([
                 'document_id' => $document->id,
                 'account_id' => $document_row['account_id'],
-                'account_name' => $document_row['name'],
+                'account_name' => $document_row['account_name'],
+                'account_code' => $document_row['account_code'],
                 'description' => $document_row['description'],
                 'detailed_code' => random_int(1111,9999),
                 'debtor' => $document_row['debtor'],
@@ -68,7 +69,9 @@ class DocumentController extends Controller
      */
     public function show(document $document)
     {
-        //
+        return response()->json([
+            'document' => new DocumentResource($document)
+        ])->setStatusCode(200);
     }
 
     /**
@@ -84,12 +87,31 @@ class DocumentController extends Controller
      */
     public function update(Request $request, document $document)
     {
-        $document->update([
-            'description' => $request->get('description'),
+
+            $document->update([
+            'branch_id' => auth()->user()->staff->branch_id,
+            'staff_id' => auth()->user()->staff->id,
+            'title' => $request->get('title'),
             'type' => $request->get('type'),
             'status' => $request->get('status'),
+            'date' => $request->get('date'),
+            'due_date' => $request->get('due_date'),
         ]);
 
+        $documents = $request->get('document_rows');
+
+        foreach($documents as $document_row){
+            documentRows::query()->where('id',$document_row['document_row_id'])->update([
+                'document_id' => $document->id,
+                'account_id' => $document_row['account_id'],
+                'account_name' => $document_row['account_name'],
+                'account_code' => $document_row['account_code'],
+                'description' => $document_row['description'],
+                'detailed_code' => random_int(1111,9999),
+                'debtor' => $document_row['debtor'],
+                'creditor' => $document_row['creditor'],
+            ]);
+        }
 
 
         return response()->json([

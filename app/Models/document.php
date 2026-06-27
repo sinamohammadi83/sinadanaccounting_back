@@ -21,6 +21,6 @@ class document extends Model
     }
 
     public function accept_staff(){
-        return $this->belongsTo(Staff::class,'staff');
+        return $this->belongsTo(Staff::class,'accept_staff_id');
     }
 }
