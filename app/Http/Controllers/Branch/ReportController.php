@@ -107,4 +107,9 @@ class ReportController extends Controller
             'top_customers' => $top_customers
         ])->setStatusCode(200);
     }
+
+    public function filter(Request $request)
+    {
+
+    }
 }

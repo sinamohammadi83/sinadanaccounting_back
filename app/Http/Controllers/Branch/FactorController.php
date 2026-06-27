@@ -72,6 +72,7 @@ class FactorController extends Controller
             'title' => 'سند خودکار',
             'type' => $request->get('type'),
             'status' => $request->get('type'),
+            'due_date' => $request->get('due_date'),
 
         ]);
 
@@ -115,12 +116,13 @@ class FactorController extends Controller
 
             documentRows::query()->create([
                 'document_id' => $document->id,
+                'account_id' => $creditor_account->id,
                 'account_name' => $creditor_account->name,
+                'account_code' => $creditor_account->code,
                 'description' => $productModel->name,
                 'detailed_code' => random_int(1111,4444),
                 'debtor' => 0,
                 'creditor' => $total_price_product,
-                'due_date' => $request->get('due_date')
             ]);
         }
 
@@ -131,12 +133,12 @@ class FactorController extends Controller
         documentRows::query()->create([
             'account_id' => $debtor_account->id,
             'document_id' => $document->id,
+            'account_code' => $debtor_account->code,
             'account_name' => $debtor_account->name,
-            'description' => $productModel->name,
+            'description' => 'حساب مشتری',
             'detailed_code' => random_int(1111,4444),
             'debtor' => $factor->total_price,
             'creditor' => 0,
-            'due_date' => $request->get('due_date')
         ]);
 
 

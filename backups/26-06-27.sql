@@ -1,0 +1,1 @@
+INSERT INTO `factors` (`id`, `branch_id`, `staff_id`, `category_id`, `person_id`, `title`, `date`, `due_date`, `paid_price`, `total_price`, `type`, `created_at`, `updated_at`) VALUES ('2', '1', '1', '1', '1', 'ف1 22', '2026-04-04', '2026-04-04', '0', '950000000', '0', '2026-06-27 21:22:38', '2026-06-27 21:22:38');

@@ -37,7 +37,7 @@ Route::post('/login',[LoginController::class,'store']);
 Route::delete('/logout',[LoginController::class,'destroy'])->middleware("auth:sanctum");
 Route::get('/login-check',[LoginController::class,'check'])->middleware("auth:sanctum");
 
-
+Route::get('/backup',[\App\Http\Controllers\Branch\BackupController::class,'store']);
 Route::prefix('/branch')->middleware(['auth:sanctum'])->group(function (){
     Route::resource("persons",PersonController::class);
     Route::get('/products/search',[ProductController::class,'findProduct']);
@@ -57,4 +57,5 @@ Route::prefix('/branch')->middleware(['auth:sanctum'])->group(function (){
     Route::get('/get-permissions',[ProfileController::class,'getPermissions']);
     Route::get('/reports',[\App\Http\Controllers\Branch\ReportController::class,'index']);
     Route::get('/individual-account-activity/{person}',[\App\Http\Controllers\Branch\IndividualAccountActivityController::class,'show']);
+
 });
