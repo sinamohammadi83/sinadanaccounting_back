@@ -18,7 +18,7 @@ return new class extends Migration
             $table->foreignId('staff_id')->constrained();
             $table->foreignId('accept_staff_id')->nullable()->constrained('staff');
             $table->foreignId('factor_id')->nullable()->comment('فاکتور')->constrained();
-            $table->string('description',255);
+            $table->string('title',255);
             $table->string('type',1);
             $table->string('status',1);
             $table->timestamps();
