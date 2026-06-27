@@ -22,7 +22,7 @@ class NewDocumentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'description' => ['required'],
+            'title' => ['required'],
             'type' => ['required'],
             'status' => ['required'],
         ];

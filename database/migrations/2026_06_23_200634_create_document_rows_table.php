@@ -20,7 +20,6 @@ return new class extends Migration
             $table->string('detailed_code',4);
             $table->unsignedBigInteger('debtor');
             $table->unsignedBigInteger('creditor');
-            $table->date('due_date');
             $table->timestamps();
         });
     }

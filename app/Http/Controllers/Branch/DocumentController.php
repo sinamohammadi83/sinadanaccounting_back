@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Branch;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Branch\NewDocumentRequest;
 use App\Models\document;
+use App\Models\documentRows;
 use Illuminate\Http\Request;
 
 class DocumentController extends Controller
@@ -33,20 +34,28 @@ class DocumentController extends Controller
     public function store(NewDocumentRequest $request)
     {
         $document = document::query()->create([
-            'description' => $request->get('description'),
+            'branch_id' => auth()->user()->staff->branch_id,
+            'staff_id' => auth()->user()->staff->id,
+            'title' => $request->get('title'),
             'type' => $request->get('type'),
             'status' => $request->get('status'),
-        ]);
-
-        $document->documentRows()->create([
-            'account_id' => $request->get('account_id'),
-            'account_name' => $request->get('account_name'),
-            'description' => $request->get('description'),
-            'detailed_code' => random_int(1111,9999),
-            'debtor' => $request->get('debtor'),
-            'creditor' => $request->get('creditor'),
+            'date' => $request->get('date'),
             'due_date' => $request->get('due_date'),
         ]);
+
+        $documents = $request->get('document_rows');
+
+        foreach($documents as $document_row){
+            documentRows::query()->create([
+                'document_id' => $document->id,
+                'account_id' => $document_row['account_id'],
+                'account_name' => $document_row['name'],
+                'description' => $document_row['description'],
+                'detailed_code' => random_int(1111,9999),
+                'debtor' => $document_row['debtor'],
+                'creditor' => $document_row['creditor'],
+            ]);
+        }
 
         return response()->json([
             'msg' => 'سند با موفیت اضافه شد'

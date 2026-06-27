@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('documents', function (Blueprint $table) {
             $table->id()->startingValue(100000);
-            $table->date('date');
             $table->foreignId('branch_id')->constrained();
             $table->foreignId('staff_id')->constrained();
             $table->foreignId('accept_staff_id')->nullable()->constrained('staff');
@@ -21,6 +20,8 @@ return new class extends Migration
             $table->string('title',255);
             $table->string('type',1);
             $table->string('status',1);
+            $table->date('date');
+            $table->date('due_date');
             $table->timestamps();
         });
     }

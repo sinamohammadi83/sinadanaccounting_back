@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Branch\AccountController;
+use App\Http\Controllers\Branch\DocumentController;
 use App\Http\Controllers\Branch\FactorController;
 use App\Http\Controllers\Branch\LedgerController;
 use App\Http\Controllers\Branch\PersonController;
@@ -46,6 +47,7 @@ Route::prefix('/branch')->middleware(['auth:sanctum'])->group(function (){
     Route::resource('ledgers',LedgerController::class);
     Route::resource('staffs',StaffController::class);
     Route::resource('accounts',AccountController::class);
+    Route::resource('documents',DocumentController::class);
     Route::get('/permissions',[RoleController::class,'get_permissions']);
     Route::get("/storages",[FactorController::class,'getStorages']);
     Route::get("/categories",[ProductController::class,'getCategories']);
