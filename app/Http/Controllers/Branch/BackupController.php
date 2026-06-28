@@ -25,74 +25,140 @@ class BackupController extends Controller
 {
     public function store()
     {
-        $textBackup = '';
 
-        foreach(Factor::all() as $item){
-            $textBackup .= "INSERT INTO `factors` (`id`, `branch_id`, `staff_id`, `category_id`, `person_id`, `title`, `date`, `due_date`, `paid_price`, `total_price`, `type`, `created_at`, `updated_at`) VALUES ('$item->id', '$item->branch_id', '$item->staff_id', '$item->category_id', '$item->person_id', '$item->title', '$item->date', '$item->due_date', '$item->paid_price', '$item->total_price', '$item->type', '$item->created_at', '$item->updated_at');";
+        $backupFile = base_path().'/backups/'.date('Y-m-d').'.sql';
+        $command = "mysqldump --user=root --password= --host=localhost --ssl-mode=DISABLED sinadanaaccounting --result-file=\"{$backupFile}\" 2>&1";
+        exec($command, $output, $returnCode);
+
+        if ($returnCode !== 0) {
+            dd($output);
         }
 
-        foreach(User::all() as $item){
-            $textBackup .= "INSERT INTO `factors` (`id`, `branch_id`, `staff_id`, `category_id`, `person_id`, `title`, `date`, `due_date`, `paid_price`, `total_price`, `type`, `created_at`, `updated_at`) VALUES ('$item->id', '$item->branch_id', '$item->staff_id', '$item->category_id', '$item->person_id', '$item->title', '$item->date', '$item->due_date', '$item->paid_price', '$item->total_price', '$item->type', '$item->created_at', '$item->updated_at');";
+        return response()->json([
+            'msg' => 'پشتیبان گیری با موفقیت انجام شد'
+        ])->setStatusCode(200);
+    }
+
+    // پردازش آپلود و بازیابی
+    public function restore(Request $request)
+    {
+        // 1. اعتبارسنجی فایل
+        $request->validate([
+            'backup_file' => 'required|file|max:51200' // حداکثر 50 مگابایت
+        ]);
+
+        $file = $request->file('backup_file');
+        $originalName = $file->getClientOriginalName();
+        $tempPath = storage_path('app/temp_restore/');
+
+        // ایجاد پوشه موقت اگر وجود ندارد
+        if (!is_dir($tempPath)) {
+            mkdir($tempPath, 0777, true);
         }
 
-        foreach(Account::all() as $item){
-            $textBackup .= "INSERT INTO `factors` (`id`, `branch_id`, `staff_id`, `category_id`, `person_id`, `title`, `date`, `due_date`, `paid_price`, `total_price`, `type`, `created_at`, `updated_at`) VALUES ('$item->id', '$item->branch_id', '$item->staff_id', '$item->category_id', '$item->person_id', '$item->title', '$item->date', '$item->due_date', '$item->paid_price', '$item->total_price', '$item->type', '$item->created_at', '$item->updated_at');";
+        // ذخیره فایل در پوشه موقت با نام یکتا
+        $tempFile = $tempPath . time() . '_' . basename($originalName);
+        move_uploaded_file($file->getPathname(), $tempFile);
+
+        try {
+            // 2. اگر فایل zip است، آن را خارج کنید
+            $sqlFile = $tempFile;
+            if (pathinfo($tempFile, PATHINFO_EXTENSION) === 'zip') {
+                $zip = new ZipArchive();
+                if ($zip->open($tempFile) === true) {
+                    $extractPath = $tempPath . 'extracted_' . time();
+                    $zip->extractTo($extractPath);
+                    $zip->close();
+
+                    // پیدا کردن اولین فایل .sql در زیپ
+                    $files = scandir($extractPath);
+                    $sqlFile = null;
+                    foreach ($files as $f) {
+                        if (pathinfo($f, PATHINFO_EXTENSION) === 'sql') {
+                            $sqlFile = $extractPath . '/' . $f;
+                            break;
+                        }
+                    }
+                    if (!$sqlFile) {
+                        throw new \Exception('هیچ فایل SQL در زیپ یافت نشد.');
+                    }
+                } else {
+                    throw new \Exception('خطا در باز کردن فایل ZIP.');
+                }
+            }
+
+            // 3. اجرای بازیابی با mysql client
+            $database = env('DB_DATABASE');
+            $user = env('DB_USERNAME');
+            $password = env('DB_PASSWORD');
+            $host = env('DB_HOST');
+            $port = env('DB_PORT', 3306);
+
+            // دستور restore با SSL غیرفعال
+            $command = "mysql --user={$user} --password={$password} --host={$host} --port={$port} --ssl-mode=DISABLED {$database} < \"{$sqlFile}\" 2>&1";
+
+            exec($command, $output, $returnCode);
+
+            if ($returnCode !== 0) {
+                throw new \Exception('خطا در بازیابی: ' . implode("\n", $output));
+            }
+
+            // 4. همه چیز موفقیت‌آمیز بود
+            $success = true;
+            $message = 'بازیابی با موفقیت انجام شد.';
+
+        } catch (\Exception $e) {
+            $success = false;
+            $message = $e->getMessage();
         }
 
-        foreach(Branch::all() as $item){
-            $textBackup .= "INSERT INTO `factors` (`id`, `branch_id`, `staff_id`, `category_id`, `person_id`, `title`, `date`, `due_date`, `paid_price`, `total_price`, `type`, `created_at`, `updated_at`) VALUES ('$item->id', '$item->branch_id', '$item->staff_id', '$item->category_id', '$item->person_id', '$item->title', '$item->date', '$item->due_date', '$item->paid_price', '$item->total_price', '$item->type', '$item->created_at', '$item->updated_at');";
+        // 5. پاکسازی فایل‌های موقت (حذف فایل‌های آپلود شده و زیپ استخراجی)
+        $this->cleanupTempFiles($tempPath, $tempFile, $sqlFile ?? null, $extractPath ?? null);
+
+        if ($success) {
+            return response()->json([
+                'msg' => 'بازیابی با موفقیت انجام شد'
+            ])->setStatusCode(200);
+        } else {
+            return response()->json([
+                'msg' => 'بازیابی با خطا روبه رو شد'
+            ])->setStatusCode(200);
+        }
+    }
+
+    // متد پاکسازی فایل‌های موقت
+    private function cleanupTempFiles($tempPath, $uploadedFile, $sqlFile, $extractPath)
+    {
+        // حذف فایل آپلود شده
+        if (file_exists($uploadedFile)) {
+            @unlink($uploadedFile);
         }
 
-        foreach(Category::all() as $item){
-            $textBackup .= "INSERT INTO `factors` (`id`, `branch_id`, `staff_id`, `category_id`, `person_id`, `title`, `date`, `due_date`, `paid_price`, `total_price`, `type`, `created_at`, `updated_at`) VALUES ('$item->id', '$item->branch_id', '$item->staff_id', '$item->category_id', '$item->person_id', '$item->title', '$item->date', '$item->due_date', '$item->paid_price', '$item->total_price', '$item->type', '$item->created_at', '$item->updated_at');";
+        // حذف فایل SQL استخراج شده (اگر از زیپ خارج شده باشد)
+        if ($sqlFile && file_exists($sqlFile) && $sqlFile !== $uploadedFile) {
+            @unlink($sqlFile);
         }
 
-        foreach(City::all() as $item){
-            $textBackup .= "INSERT INTO `factors` (`id`, `branch_id`, `staff_id`, `category_id`, `person_id`, `title`, `date`, `due_date`, `paid_price`, `total_price`, `type`, `created_at`, `updated_at`) VALUES ('$item->id', '$item->branch_id', '$item->staff_id', '$item->category_id', '$item->person_id', '$item->title', '$item->date', '$item->due_date', '$item->paid_price', '$item->total_price', '$item->type', '$item->created_at', '$item->updated_at');";
+        // حذف پوشه استخراجی زیپ
+        if ($extractPath && is_dir($extractPath)) {
+            $this->deleteDirectory($extractPath);
         }
 
-        foreach(document::all() as $item){
-            $textBackup .= "INSERT INTO `factors` (`id`, `branch_id`, `staff_id`, `category_id`, `person_id`, `title`, `date`, `due_date`, `paid_price`, `total_price`, `type`, `created_at`, `updated_at`) VALUES ('$item->id', '$item->branch_id', '$item->staff_id', '$item->category_id', '$item->person_id', '$item->title', '$item->date', '$item->due_date', '$item->paid_price', '$item->total_price', '$item->type', '$item->created_at', '$item->updated_at');";
+        // پاک کردن پوشه موقت اگر خالی شد
+        if (is_dir($tempPath) && count(scandir($tempPath)) == 2) { // فقط . و ..
+            @rmdir($tempPath);
         }
+    }
 
-        foreach(documentRows::all() as $item){
-            $textBackup .= "INSERT INTO `factors` (`id`, `branch_id`, `staff_id`, `category_id`, `person_id`, `title`, `date`, `due_date`, `paid_price`, `total_price`, `type`, `created_at`, `updated_at`) VALUES ('$item->id', '$item->branch_id', '$item->staff_id', '$item->category_id', '$item->person_id', '$item->title', '$item->date', '$item->due_date', '$item->paid_price', '$item->total_price', '$item->type', '$item->created_at', '$item->updated_at');";
+    // متد کمکی برای حذف بازگشتی پوشه
+    private function deleteDirectory($dir)
+    {
+        if (!file_exists($dir)) return true;
+        if (!is_dir($dir)) return unlink($dir);
+        foreach (scandir($dir) as $item) {
+            if ($item == '.' || $item == '..') continue;
+            if (!$this->deleteDirectory($dir . DIRECTORY_SEPARATOR . $item)) return false;
         }
-
-        foreach(Ledger::all() as $item){
-            $textBackup .= "INSERT INTO `factors` (`id`, `branch_id`, `staff_id`, `category_id`, `person_id`, `title`, `date`, `due_date`, `paid_price`, `total_price`, `type`, `created_at`, `updated_at`) VALUES ('$item->id', '$item->branch_id', '$item->staff_id', '$item->category_id', '$item->person_id', '$item->title', '$item->date', '$item->due_date', '$item->paid_price', '$item->total_price', '$item->type', '$item->created_at', '$item->updated_at');";
-        }
-
-        foreach(Permission::all() as $item){
-            $textBackup .= "INSERT INTO `factors` (`id`, `branch_id`, `staff_id`, `category_id`, `person_id`, `title`, `date`, `due_date`, `paid_price`, `total_price`, `type`, `created_at`, `updated_at`) VALUES ('$item->id', '$item->branch_id', '$item->staff_id', '$item->category_id', '$item->person_id', '$item->title', '$item->date', '$item->due_date', '$item->paid_price', '$item->total_price', '$item->type', '$item->created_at', '$item->updated_at');";
-        }
-
-        foreach(Person::all() as $item){
-            $textBackup .= "INSERT INTO `factors` (`id`, `branch_id`, `staff_id`, `category_id`, `person_id`, `title`, `date`, `due_date`, `paid_price`, `total_price`, `type`, `created_at`, `updated_at`) VALUES ('$item->id', '$item->branch_id', '$item->staff_id', '$item->category_id', '$item->person_id', '$item->title', '$item->date', '$item->due_date', '$item->paid_price', '$item->total_price', '$item->type', '$item->created_at', '$item->updated_at');";
-        }
-
-        foreach(Product::all() as $item){
-            $textBackup .= "INSERT INTO `factors` (`id`, `branch_id`, `staff_id`, `category_id`, `person_id`, `title`, `date`, `due_date`, `paid_price`, `total_price`, `type`, `created_at`, `updated_at`) VALUES ('$item->id', '$item->branch_id', '$item->staff_id', '$item->category_id', '$item->person_id', '$item->title', '$item->date', '$item->due_date', '$item->paid_price', '$item->total_price', '$item->type', '$item->created_at', '$item->updated_at');";
-        }
-
-        foreach(Province::all() as $item){
-            $textBackup .= "INSERT INTO `factors` (`id`, `branch_id`, `staff_id`, `category_id`, `person_id`, `title`, `date`, `due_date`, `paid_price`, `total_price`, `type`, `created_at`, `updated_at`) VALUES ('$item->id', '$item->branch_id', '$item->staff_id', '$item->category_id', '$item->person_id', '$item->title', '$item->date', '$item->due_date', '$item->paid_price', '$item->total_price', '$item->type', '$item->created_at', '$item->updated_at');";
-        }
-
-        foreach(Role::all() as $item){
-            $textBackup .= "INSERT INTO `factors` (`id`, `branch_id`, `staff_id`, `category_id`, `person_id`, `title`, `date`, `due_date`, `paid_price`, `total_price`, `type`, `created_at`, `updated_at`) VALUES ('$item->id', '$item->branch_id', '$item->staff_id', '$item->category_id', '$item->person_id', '$item->title', '$item->date', '$item->due_date', '$item->paid_price', '$item->total_price', '$item->type', '$item->created_at', '$item->updated_at');";
-        }
-
-        foreach(Staff::all() as $item){
-            $textBackup .= "INSERT INTO `factors` (`id`, `branch_id`, `staff_id`, `category_id`, `person_id`, `title`, `date`, `due_date`, `paid_price`, `total_price`, `type`, `created_at`, `updated_at`) VALUES ('$item->id', '$item->branch_id', '$item->staff_id', '$item->category_id', '$item->person_id', '$item->title', '$item->date', '$item->due_date', '$item->paid_price', '$item->total_price', '$item->type', '$item->created_at', '$item->updated_at');";
-        }
-
-        foreach(Storage::all() as $item){
-            $textBackup .= "INSERT INTO `factors` (`id`, `branch_id`, `staff_id`, `category_id`, `person_id`, `title`, `date`, `due_date`, `paid_price`, `total_price`, `type`, `created_at`, `updated_at`) VALUES ('$item->id', '$item->branch_id', '$item->staff_id', '$item->category_id', '$item->person_id', '$item->title', '$item->date', '$item->due_date', '$item->paid_price', '$item->total_price', '$item->type', '$item->created_at', '$item->updated_at');";
-        }
-
-        $file = fopen(app_path('../').'/backups/'.date('y-m-d').'.sql','w');
-        fwrite($file,$textBackup);
-        fclose($file);
+        return rmdir($dir);
     }
 }
