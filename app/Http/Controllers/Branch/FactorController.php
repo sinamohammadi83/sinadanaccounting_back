@@ -221,7 +221,6 @@ class FactorController extends Controller
             $total_price_factor += $total_price_product;
 
             $syncData[$product['product_id']] = [
-                'title' => $product['title'],
                 'unit' => $product['unit'],
                 'count' => $product['count'],
                 'unit_price' => $product['unit_price'],
